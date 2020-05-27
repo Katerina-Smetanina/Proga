@@ -1,0 +1,4 @@
+﻿  Bucket_sort.cpp
+C:\Users\katsm\source\repos\Bucket_sort\Bucket_sort.cpp(34,20): warning C4244: =: преобразование "int" в "float", возможна потеря данных
+C:\Users\katsm\source\repos\Bucket_sort\Bucket_sort.cpp(54,21): warning C4018: <: несоответствие типов со знаком и без знака
+  Bucket_sort.vcxproj -> C:\Users\katsm\source\repos\Bucket_sort\Debug\Bucket_sort.exe

@@ -1,0 +1,4 @@
+﻿  radix_sort.cpp
+C:\Users\katsm\Documents\git_proga\radix_sort\radix_sort.cpp(14,21): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\katsm\Documents\git_proga\radix_sort\radix_sort.cpp(21,22): warning C4018: <: несоответствие типов со знаком и без знака
+  radix_sort.vcxproj -> C:\Users\katsm\Documents\git_proga\radix_sort\Debug\radix_sort.exe
