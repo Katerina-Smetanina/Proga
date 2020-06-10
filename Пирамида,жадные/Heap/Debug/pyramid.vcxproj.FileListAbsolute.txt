@@ -1,0 +1,2 @@
+C:\Users\katsm\source\repos\Heap\Debug\pyramid.exe
+C:\Users\katsm\source\repos\Heap\Debug\pyramid.pdb

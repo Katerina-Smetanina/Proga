@@ -1,0 +1,2 @@
+C:\Users\katsm\source\repos\Greedy_algorithm\Debug\Greedy_algorithm.exe
+C:\Users\katsm\source\repos\Greedy_algorithm\Debug\Greedy_algorithm.pdb
