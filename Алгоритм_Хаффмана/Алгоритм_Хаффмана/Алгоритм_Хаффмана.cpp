@@ -5,27 +5,30 @@
 #include <fstream>
 using namespace std;
 
-class Node
+ struct Node
 {
-public:
 	int a;
 	char c;
 	Node* left, * right;
 
-	Node() { left = right = NULL; }
+	Node() { 
+		this->left = right = NULL;
+	}
 
 	Node(Node* L, Node* R)
 	{
-		left = L;
-		right = R;
-		a = L->a + R->a;
+		this->left = L;
+		this->right = R;
+		this->a = L->a + R->a;
 	}
 };
 
 
 struct MyCompare
 {
-	bool operator()(const Node* l, const Node* r) const { return l->a < r->a; }
+	bool operator()(const Node* l, const Node* r) const {
+		return l->a < r->a;
+	}
 };
 
 
@@ -120,7 +123,7 @@ int main(int argc, char* argv[])
 
 	////// Выводим коды в файл output.txt
 
-	/*f.clear(); f.seekg(0); // перемещаем указатель снова в начало файла
+	f.clear(); f.seekg(0); // перемещаем указатель снова в начало файла
 
 	ofstream g("output.txt", ios::out | ios::binary);
 
@@ -133,7 +136,10 @@ int main(int argc, char* argv[])
 		{
 			buf = buf | x[n] << (7 - count);
 			count++;
-			if (count == 8) { count = 0;   g << buf; buf = 0; }
+			if (count == 8) {
+			count = 0;   
+			g << buf; 
+			buf = 0; }
 		}
 	}
 
@@ -158,7 +164,7 @@ int main(int argc, char* argv[])
 		if (count == 8) { count = 0; byte = F.get(); }
 	}
 
-	F.close();*/
+	F.close();
 
 	return 0;
 }
