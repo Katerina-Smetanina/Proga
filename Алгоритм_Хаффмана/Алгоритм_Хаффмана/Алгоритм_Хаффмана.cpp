@@ -1,170 +1,124 @@
 ﻿#include <iostream>
-#include <vector>
 #include <map>
-#include <list>
+#include <queue>
 #include <fstream>
+#define MAX_TREE_HT 256 
 using namespace std;
+map<char, string> codes;
+map<char, int> freq;
 
- struct Node
+struct MinHeapNode
 {
-	int a;
-	char c;
-	Node* left, * right;
+    char data;
+    int freq;
+    MinHeapNode* left, * right;
 
-	Node() { 
-		this->left = right = NULL;
-	}
-
-	Node(Node* L, Node* R)
-	{
-		this->left = L;
-		this->right = R;
-		this->a = L->a + R->a;
-	}
+    MinHeapNode(char data, int freq)
+    {
+        left = right = NULL;
+        this->data = data;
+        this->freq = freq;
+    }
+};
+struct compare
+{
+    bool operator()(MinHeapNode* l, MinHeapNode* r)
+    {
+        return (l->freq > r->freq);
+    }
 };
 
-
-struct MyCompare
+void printCodes(struct MinHeapNode* root, string str)
 {
-	bool operator()(const Node* l, const Node* r) const {
-		return l->a < r->a;
-	}
-};
+    if (!root)
+        return;
+    if (root->data != '$')
+        cout << root->data << ": " << str << "\n";
 
-
-vector<bool> code;
-map<char, vector<bool> > table;
-void print(Node* root, int k = 0)
-{
-	if (root != NULL)
-	{
-		print(root->left, k + 2);
-
-		for (int i = 0; i < k; i++)
-		{
-			cout << " ";
-		}
-	}
-	if (root->c)
-		cout << root->a << "(" << root->c << ")" << endl;
-	else
-		cout << root->a << endl;
-	print(root->right, k + 2);
+    printCodes(root->left, str + "0");
+    printCodes(root->right, str + "1");
 }
 
-
-void BuildTable(Node* root)
+void storeCodes(struct MinHeapNode* root, string str)
 {
-	if (root->left != NULL)
-	{
-		code.push_back(0);
-		BuildTable(root->left);
-	}
+    if (root == NULL)
+        return;
+    if (root->data != '$')
+        codes[root->data] = str;
 
-	if (root->right != NULL)
-	{
-		code.push_back(1);
-		BuildTable(root->right);
-	}
-
-	if (root->left == NULL && root->right == NULL) table[root->c] = code;
-
-	code.pop_back();
+    storeCodes(root->left, str + "0");
+    storeCodes(root->right, str + "1");
 }
 
+priority_queue<MinHeapNode*, vector<MinHeapNode*>, compare> minHeap;
 
-int main(int argc, char* argv[])
+void HuffmanCodes(int size)
 {
-	////// считаем частоты символов	
-	ifstream f("1.txt", ios::out | ios::binary);
+    struct MinHeapNode* left, * right, * top;
+    for (map<char, int>::iterator v = freq.begin(); v != freq.end(); v++)
+        minHeap.push(new MinHeapNode(v->first, v->second));
+    while (minHeap.size() != 1)
+    {
+        left = minHeap.top();
+        minHeap.pop();
+        right = minHeap.top();
+        minHeap.pop();
+        top = new MinHeapNode('$', left->freq + right->freq);
+        top->left = left;
+        top->right = right;
+        minHeap.push(top);
+    }
+    storeCodes(minHeap.top(), "");
+}
+void calcFreq(string str, int n)
+{
+    for (int i = 0; i < str.size(); i++)
+        freq[str[i]]++;
+}
+string decode_file(struct MinHeapNode* root, string s)
+{
+    string ans = "";
+    struct MinHeapNode* curr = root;
+    for (int i = 0; i < s.size(); i++)
+    {
+        if (s[i] == '0')
+            curr = curr->left;
+        else
+            curr = curr->right;
 
-	map<char, int> m;
+        if (curr->left == NULL and curr->right == NULL)
+        {
+            ans += curr->data;
+            curr = root;
+        }
+    }
+    return ans + '\0';
+}
 
-	while (!f.eof())
-	{
-		char c = f.get();
-		m[c]++;
-	}
+int main()
+{
+   // string str = "Yogender";
 
+    ifstream in("input.txt");
+    string str;
+    in >> str;
+    
+    string encodedString, decodedString;
 
-	////// записываем начальные узлы в список list
+    calcFreq(str, str.length());
+    HuffmanCodes(str.length());
 
-	list<Node*> t;
-	for (map<char, int>::iterator itr = m.begin(); itr != m.end(); ++itr)
-	{
-		Node* p = new Node;
-		p->c = itr->first;
-		p->a = itr->second;
-		t.push_back(p);
-	}
+    for (auto v = codes.begin(); v != codes.end(); v++)
+        cout << v->first << ' ' << v->second << endl;
 
+    for (auto i : str)
+        encodedString += codes[i];
 
-	//////  создаем дерево		
+    cout << "\nEncoded:\n" << encodedString << endl;
 
-	while (t.size() != 1)
-	{
-		t.sort(MyCompare());
+    decodedString = decode_file(minHeap.top(), encodedString);
+    cout << "\nDecoded:\n" << decodedString << endl;
 
-		Node* SonL = t.front();
-		t.pop_front();
-		Node* SonR = t.front();
-		t.pop_front();
-
-		Node* parent = new Node(SonL, SonR);
-		t.push_back(parent);
-
-	}
-
-	Node* root = t.front();   //root - указатель на вершину дерева
-
-	print(root);
-                     ////// создаем пары 'символ-код':			
-	BuildTable(root);
-
-	////// Выводим коды в файл output.txt
-
-	f.clear(); f.seekg(0); // перемещаем указатель снова в начало файла
-
-	ofstream g("output.txt", ios::out | ios::binary);
-
-	int count = 0; char buf = 0;
-	while (!f.eof())
-	{
-		char c = f.get();
-		vector<bool> x = table[c];
-		for (int n = 0; n < x.size(); n++)
-		{
-			buf = buf | x[n] << (7 - count);
-			count++;
-			if (count == 8) {
-			count = 0;   
-			g << buf; 
-			buf = 0; }
-		}
-	}
-
-	f.close();
-	g.close();
-
-	///// считывание из файла output.txt и преобразование обратно
-
-	ifstream F("output.txt", ios::in | ios::binary);
-
-	setlocale(LC_ALL, "Russian"); // чтоб русские символы отображались в командной строке
-
-	Node* p = root;
-	count = 0; char byte;
-	byte = F.get();
-	while (!F.eof())
-	{
-		bool b = byte & (1 << (7 - count));
-		if (b) p = p->right; else p = p->left;
-		if (p->left == NULL && p->right == NULL) { cout << p->c; p = root; }
-		count++;
-		if (count == 8) { count = 0; byte = F.get(); }
-	}
-
-	F.close();
-
-	return 0;
+    return 0;
+    in.close();
 }
